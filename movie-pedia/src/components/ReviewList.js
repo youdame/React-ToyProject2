@@ -16,7 +16,7 @@ function ReviewListItem({ item, onDelete }) {
         <p>{item.rating}</p>
         <p>{formatDate(item.createdAt)}</p>
         <p>{item.content}</p>
-        <button onClick ={handleDeleteClick}>삭제</button>
+        <button onClick={handleDeleteClick}>삭제</button>
       </div>
     </div>
   )
@@ -25,7 +25,9 @@ function ReviewListItem({ item, onDelete }) {
 function ReviewList({ items, onDelete }) {
 
   return (<ul>{items.map((item, index) => {
-    return (<li key = {index}><ReviewListItem item={item} onDelete ={onDelete} /></li>);
+    return (<li key={item.id}>
+      <ReviewListItem item={item} onDelete={onDelete} />
+    </li>);
   })}</ul>);
 }
 
