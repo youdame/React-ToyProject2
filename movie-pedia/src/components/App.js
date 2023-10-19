@@ -1,12 +1,12 @@
-import mockItems from './mock.json';
+import mockItems from '../mock.json';
 import ReviewList from "./ReviewList";
 import { useState } from "react";
 function App() {
   const [items, setItems] = useState(mockItems);
-  const [order, setOrder] = useState('createAt');
+  const [order, setOrder] = useState('createdAt');
   const sortedItems = items.sort((a, b) => b[order] - a[order]);
 
-  const handleNewestClick = () => { setOrder('createAt'); };
+  const handleNewestClick = () => { setOrder('createdAt'); };
 
   const handleBestClick = () => setOrder('rating');
 
