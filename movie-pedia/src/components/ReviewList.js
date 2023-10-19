@@ -20,10 +20,10 @@ function ReviewListItem({ item }) {
   )
 }
 
-function ReviewList({ items }) {
+function ReviewList({ items, onDelete }) {
 
   return (<ul>{items.map((item) => {
-    return (<li><ReviewListItem item={item} /></li>);
+    return (<li><ReviewListItem item={item} onDelete ={onDelete} /></li>);
   })}</ul>);
 }
 
