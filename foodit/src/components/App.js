@@ -14,12 +14,12 @@ function App() {
   };
   const sortedItems = items.sort((a, b) => b[order] - a[order]);
 
-  const handleLoad = async () => {
-    const {foods} = await getFoods();
+  const handleLoad = async (orderQuery) => {
+    const {foods} = await getFoods(orderQuery);
     setItems(foods);
   }
   
-  useEffect(() => {handleLoad()}, []);
+  useEffect(() => {handleLoad(order)}, [order]);
 
   return (
     <div>
