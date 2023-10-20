@@ -1,6 +1,6 @@
-export async function getFoods(order = 'createdAt'){
-  const query = `order=${order}`
-  const response = await fetch(`https://learn.codeit.kr/4062/foods?${query}`);
+export async function getFoods(order = 'createdAt', cursor = '', limit = 10){
+  const query = `order=${order}&cursor=${cursor}&limit=${limit}`;
+  const response = await fetch(`https://learn.codeit.kr/api/foods?${query}`);
   const result = await response.json();
   return result;
 }
