@@ -8,7 +8,7 @@ function App() {
   const [cursor, setCursor] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingError, setLoadingError] = useState(null);
-
+  const [search, setSearch] = useState('');
 
   const handleEarlyClick = () => setOrder('createdAt');
   const handleCalorieClick = () => setOrder('calorie');
@@ -43,14 +43,24 @@ function App() {
     }
 
   }
-  const handleLoadMore = () => handleLoad({ order, cursor });
+  const handleLoadMore = () => handleLoad({ order, cursor, search });
 
-  useEffect(() => { handleLoad({ order }) }, [order]);
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    setSearch(e.target['search'].value);
+  };
+
+  useEffect(() => { handleLoad({ order, search }) }, [order, search]);
 
   return (
     <div>
       <button onClick={handleEarlyClick}>최신순</button>
       <button onClick={handleCalorieClick}>칼로리순</button>
+      <form onSubmit={handleSearchSubmit}>
+        <input name="search" />
+        <button type="submit">검색</button>
+      </form>
       <FoodList items={sortedItems} onDelete={handleDelete} />
       {cursor && <button disabled={isLoading} onClick={handleLoadMore}>더 보기</button>}
       {loadingError?.message && <p>loadingError.message</p>}
