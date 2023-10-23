@@ -1,3 +1,4 @@
+
 import './FoodList.css';
 
 function formatDate(value) {
@@ -26,6 +27,8 @@ function FoodListItem({ item, onDelete }) {
 
 function FoodList({ items, onDelete }) {
   return (
+
+  
     <ul className="FoodList">
       {items.map((item) => (
         <li key={item.id}>
