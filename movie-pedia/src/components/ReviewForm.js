@@ -10,7 +10,7 @@ const INITIAL_VALUES = {
   content: "",
   imgFile: null,
 };
-function ReviewForm() {
+function ReviewForm({ onSubmitSuccess }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittingError, setSubmittingError] = useState(null);
 
@@ -36,10 +36,11 @@ function ReviewForm() {
     formData.append("content", values.content);
     formData.append("imgFile", values.imgFile);
 
+    let result;
     try {
       setSubmittingError(null);
       setIsSubmitting(true);
-      await createReview(formData);
+      result = await createReview(formData);
     } catch (error) {
       setSubmittingError(error);
       return;
@@ -47,6 +48,9 @@ function ReviewForm() {
       setIsSubmitting(false);
     }
 
+    const { review } = result;
+    onSubmitSuccess(review);
+    
     setValues(INITIAL_VALUES);
 
     console.log(values);
@@ -70,7 +74,9 @@ function ReviewForm() {
         value={values.content}
         onChange={handleInputChange}
       />
-      <button type="submit" disabled = {isSubmitting}>확인</button>
+      <button type="submit" disabled={isSubmitting}>
+        확인
+      </button>
       {submittingError?.message && <div>{submittingError.message}</div>}
     </form>
   );
