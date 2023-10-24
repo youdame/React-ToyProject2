@@ -1,27 +1,48 @@
-import { useState } from 'react';
+import { useState } from "react";
 function FoodForm() {
+  const [values, setValues] = useState({
+    title: "",
+    calorie: 0,
+    content: "",
+  });
 
-  const [title, setTitle] = useState('');
-  const [calorie, setCalorie] = useState(0);
-  const [content, setContent] = useState('');
+  function sanitize(type, value) {
+    switch (type) {
+      case "number":
+        return Number(value) || 0;
 
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
+      default:
+        return value;
+    }
   }
-  const handleCalorieChange = (e) => {
-    const nextCalorie = Number(e.target.value) || 0;
-    setCalorie(nextCalorie);
-  }
-  const handleContentChange = (e) => {
-    setContent(e.target.value);
-  }
+
+  const handleChange = (e) => {
+    const { name, value, type } = e.target;
+
+    setValues((prevValues) => ({
+      ...prevValues,
+      [name]: sanitize(type, value),
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(values);
+  };
+
   return (
-    <form >
-      <input name="title" onChange={handleTitleChange} value={title} />
-      <input name="calorie" type="number" onChange={handleCalorieChange} value={calorie} />
-      <textarea name="content" onChange={handleContentChange} value={content} />
+    <form onSubmit={handleSubmit}>
+      <input name="title" onChange={handleChange} value={values.title} />
+      <input
+        name="calorie"
+        type="number"
+        onChange={handleChange}
+        value={values.calorie}
+      />
+      <textarea name="content" onChange={handleChange} value={values.content} />
+      <button name="submit">확인</button>
     </form>
-  )
+  );
 }
 
 export default FoodForm;

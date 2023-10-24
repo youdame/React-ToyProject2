@@ -1,31 +1,41 @@
-import { useState, } from 'react';
+import { useState } from "react";
 import "./ReviewForm.css";
 function ReviewForm() {
-  const [title, setTitle] = useState('');
-  const [rating, setRating] = useState(0);
-  const [content, setContent] = useState('');
+  const [values, setValues] = useState({
+    title: "",
+    rating: 0,
+    content: "",
+  });
 
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
-  }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setValues((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
+  };
 
-  const handleRatingChange = (e) =>{
-    const nextRating = Number(e.target.value) || 0;
-    setRating(e.target.value);
-  }
-
-  const handleContentChange = (e) =>{
-    setContent(e.target.value);
-  }
-
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(values);
+  };
 
   return (
-    <form className='ReviewForm'> 
-      <input value={title} onChange={handleTitleChange}></input>
-      <input type ="number" value = {rating} onChange={handleRatingChange}></input>
-      <textarea value={content} onChange={handleContentChange}></textarea>
+    <form className="ReviewForm" onSubmit={handleSubmit}>
+      <input name="title" value={values.title} onChange={handleChange}></input>
+      <input
+        type="number"
+        value={values.rating}
+        onChange={handleChange}
+      ></input>
+      <textarea
+        name="content"
+        value={values.content}
+        onChange={handleChange}
+      ></textarea>
+      <button type="submit">확인</button>
     </form>
-  )
+  );
 }
 
 export default ReviewForm;
