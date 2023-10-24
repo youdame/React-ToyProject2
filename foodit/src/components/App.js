@@ -1,17 +1,17 @@
-import FoodList from './FoodList';
-import { useState, useEffect } from 'react';
-import { getFoods } from '../api';
-import FoodForm from './FoodForm';
+import FoodList from "./FoodList";
+import { useState, useEffect } from "react";
+import { getFoods } from "../api";
+import FoodForm from "./FoodForm";
 function App() {
-  const [order, setOrder] = useState('createdAt');
+  const [order, setOrder] = useState("createdAt");
   const [items, setItems] = useState([]);
-  const [cursor, setCursor] = useState('');
+  const [cursor, setCursor] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [loadingError, setLoadingError] = useState(null);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
 
-  const handleEarlyClick = () => setOrder('createdAt');
-  const handleCalorieClick = () => setOrder('calorie');
+  const handleEarlyClick = () => setOrder("createdAt");
+  const handleCalorieClick = () => setOrder("calorie");
 
   const handleDelete = (id) => {
     const nextItems = items.filter((item) => item.id !== id);
@@ -26,7 +26,6 @@ function App() {
       setIsLoading(true);
       setLoadingError(null);
       result = await getFoods(options);
-
     } catch (error) {
       setLoadingError(error);
     } finally {
@@ -41,21 +40,25 @@ function App() {
     } else {
       setItems((prevItems) => [...prevItems, ...foods]);
     }
-
-  }
+  };
   const handleLoadMore = () => handleLoad({ order, cursor, search });
-
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    setSearch(e.target['search'].value);
+    setSearch(e.target["search"].value);
   };
 
-  useEffect(() => { handleLoad({ order, search }) }, [order, search]);
+  const handleSubmitSuccess = (review) => {
+    setItems((prevItems) => [...prevItems, review]);
+  };
+
+  useEffect(() => {
+    handleLoad({ order, search });
+  }, [order, search]);
 
   return (
     <div>
-      <FoodForm  />
+      <FoodForm onSubmitSuccess={handleSubmitSuccess} />
 
       <button onClick={handleEarlyClick}>최신순</button>
       <button onClick={handleCalorieClick}>칼로리순</button>
@@ -64,7 +67,11 @@ function App() {
         <button type="submit">검색</button>
       </form>
       <FoodList items={sortedItems} onDelete={handleDelete} />
-      {cursor && <button disabled={isLoading} onClick={handleLoadMore}>더 보기</button>}
+      {cursor && (
+        <button disabled={isLoading} onClick={handleLoadMore}>
+          더 보기
+        </button>
+      )}
       {loadingError?.message && <p>loadingError.message</p>}
     </div>
   );
