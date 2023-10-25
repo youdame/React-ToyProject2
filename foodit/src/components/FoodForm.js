@@ -1,5 +1,6 @@
 import { useState } from "react";
 import FileInput from "./FileInput";
+
 function sanitize(type, value) {
   switch (type) {
     case "number":
@@ -23,6 +24,8 @@ function FoodForm({
   onSubmit,
   initialPreview
 }) {
+
+
   const [values, setValues] = useState(initialValues);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
