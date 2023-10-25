@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
-function FileInput({ name, value, onChange }) {
-  const [preview, setPreview] = useState("");
+function FileInput({ name, value, onChange, initialPreview }) {
+  const [preview, setPreview] = useState(initialPreview);
   const inputRef = useRef();
   const handleClearClick = (e) => {
     const inputNode = inputRef.current;
@@ -23,10 +23,10 @@ function FileInput({ name, value, onChange }) {
     setPreview(nextPreview);
 
     return () => {
-      setPreview();
+      setPreview(initialPreview);
       URL.revokeObjectURL(nextPreview);
     };
-  }, [value]);
+  }, [value, initialPreview]);
   return (
     <div>
       <img src={preview} alt="이미지 미리보기" />
