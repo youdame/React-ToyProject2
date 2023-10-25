@@ -1,6 +1,6 @@
 import FoodList from "./FoodList";
 import { useState, useEffect } from "react";
-import { createFood, getFoods, updateFood } from "../api";
+import { createFood, deleteFood, getFoods, updateFood } from "../api";
 import FoodForm from "./FoodForm";
 function App() {
   const [order, setOrder] = useState("createdAt");
@@ -13,9 +13,11 @@ function App() {
   const handleEarlyClick = () => setOrder("createdAt");
   const handleCalorieClick = () => setOrder("calorie");
 
-  const handleDelete = (id) => {
-    const nextItems = items.filter((item) => item.id !== id);
-    setItems(nextItems);
+  const handleDelete = async (id) => {
+    const result = await deleteFood(id);
+    if (!result) return;
+
+    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
   const sortedItems = items.sort((a, b) => b[order] - a[order]);
@@ -77,7 +79,12 @@ function App() {
         <input name="search" />
         <button type="submit">검색</button>
       </form>
-      <FoodList items={sortedItems} onDelete={handleDelete} onUpdate ={updateFood} onUpdateSuccess = {handleUpdateSuccess}/>
+      <FoodList
+        items={sortedItems}
+        onDelete={handleDelete}
+        onUpdate={updateFood}
+        onUpdateSuccess={handleUpdateSuccess}
+      />
       {cursor && (
         <button disabled={isLoading} onClick={handleLoadMore}>
           더 보기

@@ -1,58 +1,54 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ReviewList from "./ReviewList";
-import { createReview, getReviews, updateReview } from "../api";
 import ReviewForm from "./ReviewForm";
+import { createReview, deleteReview, getReviews, updateReview } from "../api";
+import useAsync from "../hooks/useAsync";
+import LocalContext from "../contexts/LocaleContext";
+
+const LIMIT = 6;
 
 function App() {
-  const LIMIT = 6;
   const [order, setOrder] = useState("createdAt");
-  const [items, setItems] = useState([]);
   const [offset, setOffset] = useState(0);
-  const sortedItems = items.sort((a, b) => b[order] - a[order]);
   const [hasNext, setHasNext] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadingError, setLoadingError] = useState(null);
+  const [isLoading, loadingError, getReviewsAsync] = useAsync(getReviews);
+  const [items, setItems] = useState([]);
+  const sortedItems = items.sort((a, b) => b[order] - a[order]);
 
   const handleNewestClick = () => setOrder("createdAt");
 
   const handleBestClick = () => setOrder("rating");
 
-  const handleDelete = (id) => {
-    const nextItems = items.filter((item) => item.id !== id);
-    setItems(nextItems);
+  const handleDelete = async (id) => {
+    const result = await deleteReview(id);
+    if (!result) return;
+
+    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
-  const handleLoad = async (options) => {
-    let result;
-    try {
-      setIsLoading(true);
-      setLoadingError(null);
-      result = await getReviews(options);
-    } catch (error) {
-      setLoadingError(error);
-      return;
-    } finally {
-      setIsLoading(false);
-    }
+  const handleLoad = useCallback(
+    async (options) => {
+      const result = await getReviewsAsync(options);
+      if (!result) return;
 
-    const { reviews, paging } = result;
-    // 처음에 보여줄 때
-    if (options.offset === 0) {
-      setItems(reviews);
-    } else {
-      // 그 이후로 보여줄 떄
-      setItems((prevItems) => [...prevItems, ...reviews]);
-    }
-    setOffset(options.offset + options.limit);
-    setHasNext(paging.hasNext);
-  };
+      const { paging, reviews } = result;
+      if (options.offset === 0) {
+        setItems(reviews);
+      } else {
+        setItems((prevItems) => [...prevItems, ...reviews]);
+      }
+      setOffset(options.offset + options.limit);
+      setHasNext(paging.hasNext);
+    },
+    [getReviewsAsync]
+  );
 
   const handleLoadMore = async () => {
     await handleLoad({ order, offset, limit: LIMIT });
   };
 
   const handleCreateSuccess = (review) => {
-    setItems((prevItems) => [...prevItems, review]);
+    setItems((prevItems) => [review, ...prevItems]);
   };
 
   const handleUpdateSuccess = (review) => {
@@ -65,29 +61,36 @@ function App() {
       ];
     });
   };
+
   useEffect(() => {
     handleLoad({ order, offset: 0, limit: LIMIT });
-  }, [order]);
+  }, [order, handleLoad]);
 
   return (
-    <div>
+    <LocalContext.Provider value={'ko'}>
       <div>
-        <button onClick={handleNewestClick}>최신순</button>
-        <button onClick={handleBestClick}>베스트순</button>
+        <div>
+          <button onClick={handleNewestClick}>최신순</button>
+          <button onClick={handleBestClick}>베스트순</button>
+        </div>
         <ReviewForm
           onSubmit={createReview}
           onSubmitSuccess={handleCreateSuccess}
         />
+        <ReviewList
+          items={sortedItems}
+          onDelete={handleDelete}
+          onUpdate={updateReview}
+          onUpdateSuccess={handleUpdateSuccess}
+        />
+        {hasNext && (
+          <button disabled={isLoading} onClick={handleLoadMore}>
+            더 보기
+          </button>
+        )}
+        {loadingError?.message && <span>{loadingError.message}</span>}
       </div>
-      <ReviewList items={sortedItems} onDelete={handleDelete} onUpdate = {updateReview} onUpdateSuccess = {handleUpdateSuccess} />
-      {hasNext && (
-        <button disabled={isLoading} onClick={handleLoadMore}>
-          더 보기
-        </button>
-      )}
-
-      {loadingError?.message && <span>{loadingError.message}</span>}
-    </div>
+    </LocalContext.Provider>
   );
 }
 

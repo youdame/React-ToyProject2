@@ -2,6 +2,8 @@ import { useState } from "react";
 import FileInput from "./FileInput";
 import RatingInput from "./RatingInput";
 import "./ReviewForm.css";
+import useAsync from "../hooks/useAsync";
+
 
 
 const INITIAL_VALUES = {
@@ -17,8 +19,7 @@ function ReviewForm({
   onSubmit,
   onCancel,
 }) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submittingError, setSubmittingError] = useState(null);
+  const [isSubmitting, submittingError, onSubmitAsync]  = useAsync(onSubmit);
 
   const [values, setValues] = useState(initialValues);
 
@@ -42,17 +43,8 @@ function ReviewForm({
     formData.append("content", values.content);
     formData.append("imgFile", values.imgFile);
 
-    let result;
-    try {
-      setSubmittingError(null);
-      setIsSubmitting(true);
-      result = await onSubmit(formData);
-    } catch (error) {
-      setSubmittingError(error);
-      return;
-    } finally {
-      setIsSubmitting(false);
-    }
+    let result = await onSubmitAsync(formData);
+    if(!result) return;
 
     const { review } = result;
     onSubmitSuccess(review);
